@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -57,11 +56,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
 import com.example.inventory.data.Item
-import com.example.inventory.ui.AppViewModelProvider
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
 import kotlinx.coroutines.launch
@@ -79,7 +77,7 @@ fun ItemDetailsScreen(
     navigateToEditItem: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ItemDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: ItemDetailsViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -113,21 +111,13 @@ fun ItemDetailsScreen(
             itemDetailsUiState = uiState.value,
             onSellItem = { viewModel.reduceQuantityByOne() },
             onDelete = {
-                // Note: If the user rotates the screen very fast, the operation may get cancelled
-                // and the item may not be deleted from the Database. This is because when config
-                // change occurs, the Activity will be recreated and the rememberCoroutineScope will
-                // be cancelled - since the scope is bound to composition.
                 coroutineScope.launch {
                     viewModel.deleteItem()
                     navigateBack()
                 }
             },
             modifier = Modifier
-                .padding(
-                    start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
-                    top = innerPadding.calculateTopPadding(),
-                    end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-                )
+                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         )
     }

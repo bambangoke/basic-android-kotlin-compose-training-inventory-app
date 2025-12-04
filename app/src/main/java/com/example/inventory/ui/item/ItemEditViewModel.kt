@@ -23,14 +23,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.inventory.data.ItemsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel to retrieve and update an item from the [ItemsRepository]'s data source.
  */
-class ItemEditViewModel(
+@HiltViewModel
+class ItemEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
